@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  discordUserID String?
+  createdAt     DateTime      @default(now())
+  accounts      Account[]
+  transactions  Transaction[]
+}
+
+model Account {
+  id                   String           @id @default(cuid())
+  accountName          String
+  amount               Decimal
+  createdAt            DateTime         @default(now())
+  userId               String
+  currencyId           String?
+  currency             Currency?        @relation(fields: [currencyId], references: [id])
+  user                 User             @relation(fields: [userId], references: [id])
+  accountHistory       AccountHistory[]
+  receiverTransactions Transaction[]    @relation("ReceiverAccount")
+  senderTransactions   Transaction[]    @relation("SenderAccount")
+}
+
+model Transaction {
+  id                String           @id @default(cuid())
+  amount            Decimal
+  transactionDate   DateTime         @default(now())
+  transactionType   TransactionType
+  notes             String
+  userId            String
+  senderAccountId   String
+  receiverAccountId String
+  accountHistory    AccountHistory[]
+  receiverAccount   Account          @relation("ReceiverAccount", fields: [receiverAccountId], references: [id])
+  senderAccount     Account          @relation("SenderAccount", fields: [senderAccountId], references: [id])
+  user              User             @relation(fields: [userId], references: [id])
+}
+
+model AccountHistory {
+  id             String       @id @default(cuid())
+  changeDate     DateTime     @default(now())
+  previousAmount Decimal
+  newAmount      Decimal
+  accountId      String
+  transactionId  String?
+  account        Account      @relation(fields: [accountId], references: [id])
+  transaction    Transaction? @relation(fields: [transactionId], references: [id])
+}
+
+model Currency {
+  id                String                @id @default(cuid())
+  code              String                @unique
+  name              String
+  accounts          Account[]
+  fromExchangeRates CurrencyExchangeRate? @relation("FromCurrency")
+  toExchangeRates   CurrencyExchangeRate? @relation("ToCurrency")
+}
+
+model CurrencyExchangeRate {
+  id             String   @id @default(cuid())
+  rate           Decimal
+  effectiveDate  DateTime @unique
+  fromCurrencyId String   @unique
+  toCurrencyId   String   @unique
+  fromCurrency   Currency @relation("FromCurrency", fields: [fromCurrencyId], references: [id])
+  toCurrency     Currency @relation("ToCurrency", fields: [toCurrencyId], references: [id])
+}
+
+enum TransactionType {
+  AccountToBank
+  BankToAccount
+  AccountToAccount
+}
