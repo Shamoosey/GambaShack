@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from 'next/font/local'
 import "./globals.css";
-import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
   title: "Gamba Shack",
@@ -9,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const balatro = localFont({
-  src: './fonts/balatro.ttf',
+  src: '../fonts/balatro.ttf',
   display: 'swap',
 })
 
@@ -21,7 +20,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={balatro.className}>
-        <Navbar />
         <main>
           {children}
         </main>

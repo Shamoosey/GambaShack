@@ -1,14 +1,1 @@
 @import 'tailwindcss';
-
-@theme {
-  /* --color-mint-500: oklch(0.72 0.11 178); */
-  --color-blue-nav: #0288f1
-}
-
-@font-face {
-  font-family: 'Balatro';
-  src: url('/fonts/balatro.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
